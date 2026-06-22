@@ -12,7 +12,9 @@
     "check": "biome check ./src --write",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
   },
   "dependencies": {
     "@fontsource-variable/oxanium": "^5.2.5",
@@ -38,6 +40,7 @@
     "@vitejs/plugin-react": "^4.5.2",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^4.1.9"
   }
 }
