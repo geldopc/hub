@@ -4,6 +4,9 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  test: {
+    include: ["src/**/*.test.ts"],
+  },
   plugins: [react(), tailwindcss()],
   base: "/hub/",
   server: {
