@@ -82,7 +82,7 @@ export async function fetchRepos(): Promise<GitHubRepo[]> {
 
 export async function fetchCommits(
   repo: string,
-  perPage = 10
+  perPage = 100
 ): Promise<GitHubCommit[]> {
   const raw = await githubFetch<RawCommit[]>(
     `/repos/${USERNAME}/${repo}/commits?per_page=${perPage}`
