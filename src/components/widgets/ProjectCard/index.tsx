@@ -3,6 +3,7 @@ import { ArrowSquareOutIcon, GithubLogoIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/elements/Button";
 import { StatusBadge } from "@/components/widgets/ProjectCard/StatusBadge";
 import { StackChip } from "@/components/widgets/ProjectCard/StackChip";
+import { ProgressBar } from "@/components/widgets/ProjectCard/ProgressBar";
 import type { ProjectConfig } from "@/data/config";
 import type { DerivedStory } from "@/hooks/GitHub";
 
@@ -25,13 +26,18 @@ export function ProjectCard({ id, config, stories }: ProjectCardProps) {
       <StatusBadge id={`${id}-status`} status={config.status} />
 
       <div className="flex flex-col gap-1">
-        <h2 className="font-heading text-base font-bold leading-tight">
-          {config.name}
-        </h2>
+        <div className="flex items-baseline gap-2">
+          <h2 className="font-heading text-base font-bold leading-tight">
+            {config.name}
+          </h2>
+          <span className="text-xs text-muted-foreground">{config.type}</span>
+        </div>
         <p className="text-sm text-muted-foreground leading-snug">
           {config.description}
         </p>
       </div>
+
+      <ProgressBar id={`${id}-progress`} value={config.progress} />
 
       <div className="flex flex-wrap gap-1.5">
         {chips.map((chip) => (

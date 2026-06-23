@@ -1,4 +1,5 @@
-export type ProjectStatus = "Live" | "In Progress" | "Planning";
+export type ProjectStatus = "Live" | "In Progress" | "Planning" | "Paused";
+export type ProjectType = "web app" | "api" | "saas" | "library" | "cli" | "game" | "mobile app" | "other";
 
 export type ProjectConfig = {
   repo: string;
@@ -6,6 +7,8 @@ export type ProjectConfig = {
   description: string;
   stack: string;
   status: ProjectStatus;
+  type: ProjectType;
+  progress: number;
   icon: string;
   demoUrl?: string;
 };
@@ -18,6 +21,8 @@ export const projects: ProjectConfig[] = [
       "Portfolio dashboard — status, progresso e commits de todos os projetos.",
     stack: "Vite + React + TS + Tailwind v4 + shadcn/ui",
     status: "In Progress",
+    type: "web app",
+    progress: 0,
     icon: "🔵",
     demoUrl: "https://geldopc.github.io/hub",
   },
@@ -27,6 +32,8 @@ export const projects: ProjectConfig[] = [
     description: "JSON formatter and minifier.",
     stack: "Vite + React + TS + CodeMirror + Tailwind",
     status: "Live",
+    type: "web app",
+    progress: 100,
     icon: "🟢",
     demoUrl: "https://geldopc.github.io/myJsonFormatter",
   },
@@ -37,6 +44,8 @@ export const projects: ProjectConfig[] = [
       "XML formatter with syntax highlighting and shareable URLs.",
     stack: "Vite + React + TS + CodeMirror + Tailwind",
     status: "Live",
+    type: "web app",
+    progress: 100,
     icon: "🟢",
     demoUrl: "https://geldopc.github.io/myXmlFormatter",
   },
