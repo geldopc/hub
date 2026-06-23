@@ -2,6 +2,7 @@ import * as React from "react";
 import { WarningIcon } from "@phosphor-icons/react";
 import { ProjectCard } from "@/components/widgets/ProjectCard";
 import { projects } from "@/data/config";
+import { useNotionProjects } from "@/hooks/Notion";
 import type { DerivedStory } from "@/hooks/GitHub";
 
 interface ProjectsGridProps {
@@ -12,6 +13,13 @@ interface ProjectsGridProps {
 }
 
 export function ProjectsGrid({ id, isLoading, isError, storiesMap }: ProjectsGridProps) {
+  const { data: notionData } = useNotionProjects();
+
+  const enrichedProjects = projects.map((config) => {
+    const live = notionData?.find((n) => n.repo === config.repo);
+    return live ? { ...config, ...live } : config;
+  });
+
   if (isError) {
     return (
       <div id={id} className="w-full flex flex-col items-center gap-2 py-12 text-muted-foreground">
@@ -31,7 +39,7 @@ export function ProjectsGrid({ id, isLoading, isError, storiesMap }: ProjectsGri
               className="rounded-xl border border-border bg-card px-5 py-4 h-36 animate-pulse"
             />
           ))
-        : projects.map((config, i) => (
+        : enrichedProjects.map((config, i) => (
             <div
               key={config.repo}
               style={{
