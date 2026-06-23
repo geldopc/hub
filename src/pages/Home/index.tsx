@@ -1,12 +1,11 @@
 import * as React from "react";
 import { CirclesThreeIcon } from "@phosphor-icons/react";
 import { TaskPlanner } from "@/components/modules/TaskPlanner";
-import { ProjectCard } from "@/components/widgets/ProjectCard";
-import { projects } from "@/data/config";
+import { ProjectsGrid } from "@/components/modules/ProjectsGrid";
 import { useAllProjectStories } from "@/hooks/GitHub";
 
 export function Home() {
-  const { data: storiesMap, isLoading } = useAllProjectStories();
+  const { data: storiesMap, isLoading, isError } = useAllProjectStories();
 
   return (
     <div id="home" className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center px-4 py-12">
@@ -27,27 +26,12 @@ export function Home() {
           </p>
         </div>
 
-        <div
-          className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}
-        >
-          {isLoading
-            ? Array.from({ length: projects.length }).map((_, i) => (
-                <div
-                  key={i}
-                  id={`project-card-placeholder-${i}`}
-                  className="rounded-xl border border-border bg-card px-5 py-4 h-36 animate-pulse"
-                />
-              ))
-            : projects.map((config) => (
-                <ProjectCard
-                  key={config.repo}
-                  id={`project-card-${config.repo}`}
-                  config={config}
-                  stories={storiesMap.get(config.repo)}
-                />
-              ))}
-        </div>
+        <ProjectsGrid
+          id="projects-grid"
+          isLoading={isLoading}
+          isError={isError}
+          storiesMap={storiesMap}
+        />
 
         <TaskPlanner id="task-planner" />
       </div>
