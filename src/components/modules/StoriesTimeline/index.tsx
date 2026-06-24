@@ -1,7 +1,8 @@
-import { WarningIcon } from "@phosphor-icons/react";
+import { WarningIcon, GitCommitIcon } from "@phosphor-icons/react";
 import type { DerivedStory } from "@/utils/commitGrouper";
 import type { StoryType } from "@/utils/commitGrouper";
 import { StoryRow } from "@/components/widgets/StoryRow";
+import { EmptyState } from "@/components/elements/EmptyState";
 
 const TYPE_LABELS: Record<StoryType, string> = {
   feature: "Features",
@@ -23,10 +24,12 @@ interface StoriesTimelineProps {
 export function StoriesTimeline({ id, stories, isLoading, isError, repo }: StoriesTimelineProps) {
   if (isError) {
     return (
-      <div id={id} className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-        <WarningIcon weight="thin" size={32} className="opacity-40" />
-        <p className="text-sm">Não foi possível carregar os dados do GitHub.</p>
-      </div>
+      <EmptyState
+        id={`${id}-error`}
+        icon={<WarningIcon weight="thin" size={40} />}
+        title="Não foi possível carregar os commits"
+        description="Verifique a conexão ou o token do GitHub."
+      />
     );
   }
 
@@ -53,9 +56,12 @@ export function StoriesTimeline({ id, stories, isLoading, isError, repo }: Stori
 
   if (grouped.size === 0) {
     return (
-      <div id={id} className="py-12 text-center text-sm text-muted-foreground">
-        Nenhuma story encontrada para <code className="font-mono">{repo}</code>.
-      </div>
+      <EmptyState
+        id={`${id}-empty`}
+        icon={<GitCommitIcon weight="thin" size={40} />}
+        title="Nenhum commit encontrado"
+        description={`Nenhuma story derivada para o repo ${repo}.`}
+      />
     );
   }
 

@@ -1,5 +1,6 @@
-import { WarningIcon } from "@phosphor-icons/react";
+import { WarningIcon, FolderSimpleIcon } from "@phosphor-icons/react";
 import { ProjectCard } from "@/components/widgets/ProjectCard";
+import { EmptyState } from "@/components/elements/EmptyState";
 import { projects } from "@/data/config";
 import { useNotionProjects } from "@/hooks/Notion";
 import type { DerivedStory } from "@/hooks/GitHub";
@@ -21,10 +22,23 @@ export function ProjectsGrid({ id, isLoading, isError, storiesMap }: ProjectsGri
 
   if (isError) {
     return (
-      <div id={id} className="w-full flex flex-col items-center gap-2 py-12 text-muted-foreground">
-        <WarningIcon weight="thin" size={32} className="opacity-40" />
-        <p className="text-sm">Não foi possível carregar os projetos.</p>
-      </div>
+      <EmptyState
+        id={`${id}-error`}
+        icon={<WarningIcon weight="thin" size={40} />}
+        title="Não foi possível carregar os projetos"
+        description="Verifique a conexão com o GitHub."
+      />
+    );
+  }
+
+  if (!isLoading && enrichedProjects.length === 0) {
+    return (
+      <EmptyState
+        id={`${id}-empty`}
+        icon={<FolderSimpleIcon weight="thin" size={40} />}
+        title="Nenhum projeto encontrado"
+        description="Adicione projetos ao config para visualizá-los aqui."
+      />
     );
   }
 
