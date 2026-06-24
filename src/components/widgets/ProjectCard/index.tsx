@@ -4,6 +4,7 @@ import { Button } from "@/components/elements/Button";
 import { StatusBadge } from "@/components/widgets/ProjectCard/StatusBadge";
 import { StackChip } from "@/components/widgets/ProjectCard/StackChip";
 import { ProgressBar } from "@/components/widgets/ProjectCard/ProgressBar";
+import { DurationBadge } from "@/components/widgets/ProjectCard/DurationBadge";
 import type { ProjectConfig } from "@/data/config";
 import type { DerivedStory } from "@/hooks/GitHub";
 
@@ -23,7 +24,15 @@ export function ProjectCard({ id, config, stories }: ProjectCardProps) {
       id={id}
       className="flex flex-col gap-3 rounded-xl border border-border bg-card px-5 py-4 transition-colors hover:bg-accent/40"
     >
-      <StatusBadge id={`${id}-status`} status={config.status} />
+      <div className="flex items-center justify-between gap-2">
+        <StatusBadge id={`${id}-status`} status={config.status} />
+        <DurationBadge
+          id={`${id}-duration`}
+          startDate={config.startDate}
+          endDate={config.endDate}
+          status={config.status}
+        />
+      </div>
 
       <div className="flex flex-col gap-1">
         <div className="flex items-baseline gap-2">

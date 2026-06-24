@@ -61,11 +61,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const repo = repoFromGitHubUrl(githubUrl);
       if (!repo) return null;
 
+      const dateStart = (d: string) =>
+        (props[d]?.date as { start: string } | null)?.start ?? null;
+
       return {
         repo,
+        pageId: (page as Record<string, string>).id,
         status: (props["Status"]?.select as { name: string } | null)?.name ?? "Planning",
         progress: (props["Progress"]?.number as number | null) ?? 0,
         type: (props["Type"]?.select as { name: string } | null)?.name ?? "other",
+        startDate: dateStart("Start Date") ?? dateStart("Início") ?? dateStart("Data de início"),
+        endDate: dateStart("End Date") ?? dateStart("Fim") ?? dateStart("Data de conclusão"),
       };
     })
     .filter(Boolean);

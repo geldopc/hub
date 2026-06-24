@@ -1,17 +1,37 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeftIcon, ArrowSquareOutIcon, GithubLogoIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowSquareOutIcon, CalendarBlankIcon, GithubLogoIcon, TimerIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/elements/Button";
 import { StatusBadge } from "@/components/widgets/ProjectCard/StatusBadge";
 import { ProgressBar } from "@/components/widgets/ProjectCard/ProgressBar";
 import { StackChip } from "@/components/widgets/ProjectCard/StackChip";
 import { StoriesTimeline } from "@/components/modules/StoriesTimeline";
+import { TypeBreakdown } from "@/components/widgets/TypeBreakdown";
+import { ExecutionChart } from "@/components/widgets/ExecutionChart";
 import { getProjectByRepo } from "@/data/config";
 import { useProjectStories } from "@/hooks/GitHub";
+import { useNotionProjects, useNotionTasks } from "@/hooks/Notion";
+import { formatDuration, formatLocalDate } from "@/utils/formatDuration";
+import { buildExecutionChart } from "@/utils/chartData";
 
 export function ProjectDetail() {
   const { repo } = useParams<{ repo: string }>();
   const config = repo ? getProjectByRepo(repo) : undefined;
   const { data: stories, isLoading, isError } = useProjectStories(repo ?? "");
+  const { data: notionData } = useNotionProjects();
+  const { data: notionTasks } = useNotionTasks(repo ?? "");
+  const notionProject = notionData?.find((n) => n.repo === repo);
+
+  const startDate = notionProject?.startDate ?? config?.startDate;
+  const endDate = notionProject?.endDate ?? config?.endDate;
+  const duration = config ? formatDuration(startDate, endDate, config.status) : null;
+
+  const taskDates = (notionTasks ?? [])
+    .filter((t) => t.createdDate)
+    .map((t) => t.createdDate as string);
+
+  const chartData = stories
+    ? buildExecutionChart(stories, taskDates, startDate, endDate)
+    : [];
 
   if (!config) {
     return (
@@ -26,6 +46,7 @@ export function ProjectDetail() {
 
   const chips = config.stack.split(" + ");
   const githubUrl = `https://github.com/geldopc/${config.repo}`;
+  const storyCount = stories?.length ?? 0;
 
   return (
     <div id="project-detail" className="flex flex-col gap-8 py-6">
@@ -43,7 +64,14 @@ export function ProjectDetail() {
       </Button>
 
       <div className="flex flex-col gap-3">
-        <StatusBadge id="detail-status" status={config.status} />
+        <div className="flex items-start justify-between gap-4">
+          <StatusBadge id="detail-status" status={config.status} />
+          {storyCount > 0 && (
+            <span id="detail-story-count" className="text-xs text-muted-foreground tabular-nums">
+              {storyCount} stories
+            </span>
+          )}
+        </div>
 
         <div>
           <div className="flex items-baseline gap-2">
@@ -54,6 +82,29 @@ export function ProjectDetail() {
         </div>
 
         <ProgressBar id="detail-progress" value={config.progress} />
+
+        {(startDate || duration) && (
+          <div id="detail-duration-stats" className="flex items-center gap-4 text-xs text-muted-foreground">
+            {startDate && (
+              <span className="flex items-center gap-1.5">
+                <CalendarBlankIcon weight="bold" className="size-3.5 shrink-0" />
+                {formatLocalDate(startDate)}
+                {endDate && (
+                  <>
+                    <span className="text-muted-foreground/40 mx-0.5">→</span>
+                    {formatLocalDate(endDate)}
+                  </>
+                )}
+              </span>
+            )}
+            {duration && (
+              <span className="flex items-center gap-1.5">
+                <TimerIcon weight="bold" className="size-3.5 shrink-0" />
+                {duration}
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap gap-1.5">
@@ -92,6 +143,17 @@ export function ProjectDetail() {
           </div>
         </div>
       </div>
+
+      {(stories && stories.length > 0 || chartData.length > 0) && (
+        <div id="detail-analytics" className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6 border-t border-border pt-6">
+          <TypeBreakdown id="detail-type-breakdown" stories={stories ?? []} />
+          <ExecutionChart
+            id="detail-execution-chart"
+            data={chartData}
+            hasPlanned={taskDates.length > 0}
+          />
+        </div>
+      )}
 
       <div className="border-t border-border" />
 

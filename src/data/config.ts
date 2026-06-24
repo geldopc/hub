@@ -11,6 +11,8 @@ export type ProjectConfig = {
   progress: number;
   icon: string;
   demoUrl?: string;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 export const projects: ProjectConfig[] = [
@@ -25,6 +27,7 @@ export const projects: ProjectConfig[] = [
     progress: 0,
     icon: "🔵",
     demoUrl: "https://geldopc.github.io/hub",
+    startDate: "2026-06-10",
   },
   {
     repo: "myJsonFormatter",
@@ -36,6 +39,8 @@ export const projects: ProjectConfig[] = [
     progress: 100,
     icon: "🟢",
     demoUrl: "https://geldopc.github.io/myJsonFormatter",
+    startDate: "2026-05-20",
+    endDate: "2026-06-01",
   },
   {
     repo: "myXmlFormatter",
@@ -48,6 +53,8 @@ export const projects: ProjectConfig[] = [
     progress: 100,
     icon: "🟢",
     demoUrl: "https://geldopc.github.io/myXmlFormatter",
+    startDate: "2026-06-01",
+    endDate: "2026-06-18",
   },
 ];
 
