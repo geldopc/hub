@@ -115,4 +115,65 @@ describe("groupCommitsIntoStories", () => {
 
     expect(stories[0].commits[0].message).toBe("feat: first feature");
   });
+
+  it("groups commits with same scope into one story regardless of type", () => {
+    const commits = [
+      commit("feat(editor): add syntax highlighting", "2026-06-19T10:00:00Z"),
+      commit("fix(editor): correct line number offset", "2026-06-19T11:00:00Z"),
+      commit("feat(editor): add fold gutter", "2026-06-19T12:00:00Z"),
+    ];
+
+    const stories = groupCommitsIntoStories(commits);
+
+    expect(stories).toHaveLength(1);
+    expect(stories[0].scope).toBe("editor");
+    expect(stories[0].type).toBe("feature");
+    expect(stories[0].commits).toHaveLength(3);
+    expect(stories[0].title).toBe("Add syntax highlighting");
+  });
+
+  it("keeps different scopes as separate stories", () => {
+    const commits = [
+      commit("feat(editor): add highlighting", "2026-06-19T10:00:00Z"),
+      commit("feat(toolbar): add copy button", "2026-06-19T11:00:00Z"),
+    ];
+
+    const stories = groupCommitsIntoStories(commits);
+
+    expect(stories).toHaveLength(2);
+    const scopes = stories.map((s) => s.scope);
+    expect(scopes).toContain("editor");
+    expect(scopes).toContain("toolbar");
+  });
+
+  it("mixes scoped and unscoped commits correctly", () => {
+    const commits = [
+      commit("feat(auth): add login", "2026-06-19T10:00:00Z"),
+      commit("feat: add landing page", "2026-06-19T11:00:00Z"),
+      commit("fix(auth): fix token expiry", "2026-06-19T12:00:00Z"),
+    ];
+
+    const stories = groupCommitsIntoStories(commits);
+
+    const authStory = stories.find((s) => s.scope === "auth");
+    expect(authStory).toBeDefined();
+    expect(authStory!.commits).toHaveLength(2);
+
+    const unscopedStory = stories.find((s) => !s.scope);
+    expect(unscopedStory).toBeDefined();
+    expect(unscopedStory!.title).toBe("Add landing page");
+  });
+
+  it("uses scope name as title when no feat commit in scope group", () => {
+    const commits = [
+      commit("fix(ci): fix deploy env", "2026-06-19T10:00:00Z"),
+      commit("chore(ci): update node version", "2026-06-19T11:00:00Z"),
+    ];
+
+    const stories = groupCommitsIntoStories(commits);
+
+    expect(stories).toHaveLength(1);
+    expect(stories[0].scope).toBe("ci");
+    expect(stories[0].title).toBe("Ci");
+  });
 });

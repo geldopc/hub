@@ -30,7 +30,14 @@ export function StoryRow({ id, story }: StoryRowProps) {
             open && "rotate-180"
           )}
         />
-        <span className="flex-1 text-sm font-medium leading-snug">{story.title}</span>
+        <span className="flex-1 flex items-center gap-2 min-w-0">
+          <span className="text-sm font-medium leading-snug truncate">{story.title}</span>
+          {story.scope && (
+            <span className="shrink-0 text-xs text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
+              {story.scope}
+            </span>
+          )}
+        </span>
         <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
           {commitCount} {commitCount === 1 ? "commit" : "commits"} · {formatDate(story.startDate)}
         </span>
