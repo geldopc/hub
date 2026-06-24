@@ -1,5 +1,3 @@
-import * as React from "react";
-
 interface ProgressBarProps {
   id: string;
   value: number;

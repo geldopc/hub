@@ -1,5 +1,3 @@
-import * as React from "react";
-
 interface StackChipProps {
   id: string;
   label: string;

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { WarningIcon } from "@phosphor-icons/react";
 import { ProjectCard } from "@/components/widgets/ProjectCard";
 import { projects } from "@/data/config";

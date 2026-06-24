@@ -1,4 +1,3 @@
-import * as React from "react";
 import { PlayIcon, PauseIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/elements/Button";
 import { cn } from "@/utils/css";
