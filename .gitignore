@@ -6,3 +6,10 @@ dist/
 .vercel
 playwright-report/
 test-results/
+
+# AI reference docs
+plans/
+advisor-plans/
+.claude/
+CLAUDE.md
+docs/superpowers/
