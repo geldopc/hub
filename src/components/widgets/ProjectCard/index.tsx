@@ -1,4 +1,4 @@
-import * as React from "react";
+import { Link } from "react-router-dom";
 import { ArrowSquareOutIcon, GithubLogoIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/elements/Button";
 import { StatusBadge } from "@/components/widgets/ProjectCard/StatusBadge";
@@ -27,9 +27,12 @@ export function ProjectCard({ id, config, stories }: ProjectCardProps) {
 
       <div className="flex flex-col gap-1">
         <div className="flex items-baseline gap-2">
-          <h2 className="font-heading text-base font-bold leading-tight">
+          <Link
+            to={`/project/${config.repo}`}
+            className="font-heading text-base font-bold leading-tight hover:underline underline-offset-2"
+          >
             {config.name}
-          </h2>
+          </Link>
           <span className="text-xs text-muted-foreground">{config.type}</span>
         </div>
         <p className="text-sm text-muted-foreground leading-snug">
