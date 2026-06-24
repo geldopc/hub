@@ -1,5 +1,5 @@
+import { CirclesThreeIcon } from "@phosphor-icons/react";
 import { ThemeToggle } from "@widgets/ThemeToggle";
-import { HubIcon } from "@/components/elements/HubIcon";
 
 type NavItem = {
   label: string;
@@ -18,7 +18,7 @@ export function Navbar({ title = "Portfolio", items = [] }: NavbarProps) {
       className="fixed top-0 inset-x-0 z-50 h-14 flex items-center px-6 border-b border-border/60 bg-background/75 backdrop-blur-md"
     >
       <span className="flex items-center gap-2 select-none">
-        <HubIcon size={18} />
+        <CirclesThreeIcon size={18} weight="thin" className="opacity-60" />
         <span className="font-heading font-bold text-sm tracking-widest uppercase">{title}</span>
       </span>
 

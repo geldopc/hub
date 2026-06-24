@@ -19,9 +19,10 @@ interface StoriesTimelineProps {
   isLoading: boolean;
   isError: boolean;
   repo: string;
+  filterDate?: string | null;
 }
 
-export function StoriesTimeline({ id, stories, isLoading, isError, repo }: StoriesTimelineProps) {
+export function StoriesTimeline({ id, stories, isLoading, isError, repo, filterDate }: StoriesTimelineProps) {
   if (isError) {
     return (
       <EmptyState
@@ -48,8 +49,12 @@ export function StoriesTimeline({ id, stories, isLoading, isError, repo }: Stori
     );
   }
 
+  const displayStories = filterDate
+    ? stories.filter((s) => s.endDate?.slice(0, 10) === filterDate)
+    : stories;
+
   const grouped = TYPE_ORDER.reduce((acc, type) => {
-    const group = stories.filter((s) => s.type === type);
+    const group = displayStories.filter((s) => s.type === type);
     if (group.length > 0) acc.set(type, group);
     return acc;
   }, new Map<StoryType, DerivedStory[]>());

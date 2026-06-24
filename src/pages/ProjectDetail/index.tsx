@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeftIcon, ArrowSquareOutIcon, CalendarBlankIcon, GithubLogoIcon, TimerIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/elements/Button";
@@ -24,6 +25,7 @@ export function ProjectDetail() {
   const startDate = notionProject?.startDate ?? config?.startDate;
   const endDate = notionProject?.endDate ?? config?.endDate;
   const duration = config ? formatDuration(startDate, endDate, config.status) : null;
+  const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
 
   const taskDates = (notionTasks ?? [])
     .filter((t) => t.createdDate)
@@ -49,7 +51,7 @@ export function ProjectDetail() {
   const storyCount = stories?.length ?? 0;
 
   return (
-    <div id="project-detail" className="flex flex-col gap-8 py-6">
+    <div id="project-detail" className="flex flex-col gap-8 py-8 px-4 md:px-8 max-w-4xl mx-auto">
       <Button
         id="detail-back"
         variant="ghost"
@@ -145,13 +147,27 @@ export function ProjectDetail() {
       </div>
 
       {(stories && stories.length > 0 || chartData.length > 0) && (
-        <div id="detail-analytics" className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6 border-t border-border pt-6">
-          <TypeBreakdown id="detail-type-breakdown" stories={stories ?? []} />
+        <div id="detail-analytics" className="flex flex-col gap-6 border-t border-border pt-6">
           <ExecutionChart
             id="detail-execution-chart"
             data={chartData}
             hasPlanned={taskDates.length > 0}
+            onDateSelect={setSelectedDate}
           />
+          {stories && stories.length > 0 && (
+            <TypeBreakdown id="detail-type-breakdown" stories={stories} />
+          )}
+          {selectedDate && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Commits de {formatLocalDate(selectedDate)}</span>
+              <button
+                className="underline hover:text-foreground transition-colors"
+                onClick={() => setSelectedDate(null)}
+              >
+                ver todos
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -163,6 +179,7 @@ export function ProjectDetail() {
         isLoading={isLoading}
         isError={isError}
         repo={repo ?? ""}
+        filterDate={selectedDate}
       />
     </div>
   );

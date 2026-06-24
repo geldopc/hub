@@ -3,6 +3,7 @@ import { parseLocalDate } from "@/utils/formatDuration";
 
 export interface ChartPoint {
   date: string;
+  isoDate: string;
   executed: number;
   planned: number | null;
 }
@@ -30,12 +31,22 @@ export function buildExecutionChart(
 ): ChartPoint[] {
   if (!stories.length && !startDate) return [];
 
-  const storyDates = stories.map((s) => s.endDate);
-  const allDates = [...storyDates, ...taskDates].filter(Boolean);
+  const storyDates = stories.map((s) => s.endDate?.slice(0, 10)).filter(Boolean) as string[];
+  const allActivityDates = [...storyDates, ...taskDates].filter(Boolean);
 
-  const firstDate = startDate
-    ? parseLocalDate(startDate)
-    : parseLocalDate(allDates.reduce((a, b) => (a < b ? a : b)));
+  const configStart = startDate ? parseLocalDate(startDate) : null;
+
+  const firstActivityDate = allActivityDates.length
+    ? parseLocalDate(allActivityDates.reduce((a, b) => (a < b ? a : b)))
+    : configStart;
+
+  // Start from configStart OR 3 days before first activity — whichever is later.
+  // This prevents showing a long empty leading section when all commits cluster at the end.
+  const activityMinus3 = firstActivityDate ? addDays(firstActivityDate, -3) : null;
+  const firstDate =
+    configStart && activityMinus3 && configStart >= activityMinus3
+      ? configStart
+      : activityMinus3 ?? configStart ?? parseLocalDate(allActivityDates[0]);
 
   const lastDate = endDate
     ? parseLocalDate(endDate)
@@ -53,12 +64,12 @@ export function buildExecutionChart(
     const current = addDays(firstDate, i);
     const isoDate = toISO(current);
 
-    const executed = stories.filter((s) => s.endDate <= isoDate).length;
+    const executed = stories.filter((s) => (s.endDate?.slice(0, 10) ?? "") <= isoDate).length;
     const planned = hasPlanned
       ? taskDates.filter((d) => d <= isoDate).length
       : null;
 
-    points.push({ date: formatLabel(isoDate), executed, planned });
+    points.push({ date: formatLabel(isoDate), isoDate, executed, planned });
   }
 
   return points;
