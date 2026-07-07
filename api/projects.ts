@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const NOTION_DB_ID = "f9b46a82-4664-469f-a451-dfdeec884584";
+const NOTION_DB_ID = "ac7e9bc3-1394-4406-a993-e332f9d91e7c";
 const ALLOWED_ORIGINS = [
   "https://geldopc.github.io",
   "http://localhost:5175",
