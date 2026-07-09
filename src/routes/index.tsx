@@ -7,7 +7,7 @@ const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <AppLayout title="hub" />,
+      element: <AppLayout title="myHub" />,
       children: [
         { index: true, element: <Home /> },
         { path: "project/:repo", element: <ProjectDetail /> },
