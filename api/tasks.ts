@@ -1,8 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const REPO_DATABASES: Record<string, string> = {
-  hub: "6ba33db6-84a0-471f-8945-a8323a3cb829",
-};
+const TASKS_DB_ID = "3981d92d-dfd0-81a0-95fa-c1919bf9b101";
 
 const ALLOWED_ORIGINS = [
   "https://geldopc.github.io",
@@ -28,14 +26,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!token) return res.status(500).json({ error: "NOTION_TOKEN not configured" });
 
   const repo = req.query.repo as string | undefined;
-  const dbId = repo ? REPO_DATABASES[repo] : undefined;
-
-  if (!dbId) {
-    return res.status(200).json([]);
-  }
+  if (!repo) return res.status(200).json([]);
 
   const response = await fetch(
-    `https://api.notion.com/v1/databases/${dbId}/query`,
+    `https://api.notion.com/v1/databases/${TASKS_DB_ID}/query`,
     {
       method: "POST",
       headers: {
@@ -43,7 +37,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         "Notion-Version": "2022-06-28",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ page_size: 100 }),
+      body: JSON.stringify({
+        page_size: 100,
+        filter: {
+          property: "Project",
+          select: { equals: repo },
+        },
+      }),
     }
   );
 
@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const createdTime = (page as Record<string, string>).created_time ?? null;
 
     const title = (props["Story"]?.title as Array<{ plain_text: string }> | null)?.[0]?.plain_text ?? null;
-    const status = (props["Status"]?.status as { name: string } | null)?.name ?? null;
+    const status = (props["Status"]?.select as { name: string } | null)?.name ?? null;
     const epic = (props["Epic"]?.select as { name: string } | null)?.name ?? null;
 
     return {
