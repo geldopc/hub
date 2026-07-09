@@ -21,7 +21,7 @@ export type GitHubCommit = {
   htmlUrl: string;
 };
 
-async function githubFetch<T>(path: string): Promise<T> {
+async function githubFetch<T>(path: string, fallbackOn404?: T): Promise<T> {
   const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
   };
@@ -30,6 +30,7 @@ async function githubFetch<T>(path: string): Promise<T> {
   }
 
   const res = await fetch(`${BASE_URL}${path}`, { headers });
+  if (res.status === 404 && fallbackOn404 !== undefined) return fallbackOn404;
   if (!res.ok) {
     throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
   }
@@ -85,7 +86,8 @@ export async function fetchCommits(
   perPage = 100
 ): Promise<GitHubCommit[]> {
   const raw = await githubFetch<RawCommit[]>(
-    `/repos/${USERNAME}/${repo}/commits?per_page=${perPage}`
+    `/repos/${USERNAME}/${repo}/commits?per_page=${perPage}`,
+    []
   );
 
   return raw.map((c) => ({
