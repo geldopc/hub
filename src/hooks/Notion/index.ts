@@ -1,12 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ProjectStatus, ProjectType } from "@/data/config";
+
+export type ProjectStatus = "Live" | "In Progress" | "Planning" | "Paused";
 
 export type NotionProjectData = {
   repo: string;
   pageId: string;
+  name: string;
+  description: string;
+  stack: string;
+  demoUrl: string | null;
   status: ProjectStatus;
   progress: number;
-  type: ProjectType;
+  tasksTotal: number;
+  tasksDone: number;
   startDate: string | null;
   endDate: string | null;
 };

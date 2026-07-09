@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const NOTION_DB_ID = "ac7e9bc3-1394-4406-a993-e332f9d91e7c";
+const NOTION_DB_ID = "3981d92d-dfd0-8131-b1a7-dd6301c59f3f";
 const ALLOWED_ORIGINS = [
   "https://geldopc.github.io",
   "http://localhost:5175",
@@ -56,22 +56,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const projects = json.results
     .map((page: Record<string, unknown>) => {
       const props = page.properties as Record<string, Record<string, unknown>>;
-      const githubUrl =
-        (props["GitHub URL"]?.url as string | null) ?? null;
-      const repo = repoFromGitHubUrl(githubUrl);
-      if (!repo) return null;
 
-      const dateStart = (d: string) =>
-        (props[d]?.date as { start: string } | null)?.start ?? null;
+      const richText = (key: string) =>
+        ((props[key]?.rich_text as Array<{ plain_text: string }> | null)?.[0]?.plain_text) ?? "";
+      const dateStart = (key: string) =>
+        (props[key]?.date as { start: string } | null)?.start ?? null;
+
+      const repo =
+        richText("Repo") ||
+        repoFromGitHubUrl((props["GitHub URL"]?.url as string | null) ?? null);
+      if (!repo) return null;
 
       return {
         repo,
         pageId: (page as Record<string, string>).id,
+        name: (props["Name"]?.title as Array<{ plain_text: string }> | null)?.[0]?.plain_text ?? repo,
+        description: richText("Description"),
+        stack: richText("Stack"),
+        demoUrl: (props["Demo URL"]?.url as string | null) ?? null,
         status: (props["Status"]?.select as { name: string } | null)?.name ?? "Planning",
-        progress: (props["Progress"]?.number as number | null) ?? 0,
-        type: (props["Type"]?.select as { name: string } | null)?.name ?? "other",
-        startDate: dateStart("Start Date") ?? dateStart("Início") ?? dateStart("Data de início"),
-        endDate: dateStart("End Date") ?? dateStart("Fim") ?? dateStart("Data de conclusão"),
+        progress: Math.round(((props["Progress"]?.number as number | null) ?? 0) * 100),
+        tasksTotal: (props["Tasks Total"]?.number as number | null) ?? 0,
+        tasksDone: (props["Tasks Done"]?.number as number | null) ?? 0,
+        startDate: dateStart("Start Date"),
+        endDate: dateStart("End Date"),
       };
     })
     .filter(Boolean);

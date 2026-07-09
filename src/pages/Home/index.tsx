@@ -3,9 +3,15 @@ import { CirclesThreeIcon } from "@phosphor-icons/react";
 import { TaskPlanner } from "@/components/modules/TaskPlanner";
 import { ProjectsGrid } from "@/components/modules/ProjectsGrid";
 import { useAllProjectStories } from "@/hooks/GitHub";
+import { useNotionProjects } from "@/hooks/Notion";
 
 export function Home() {
-  const { data: storiesMap, isLoading, isError } = useAllProjectStories();
+  const { data: notionProjects } = useNotionProjects();
+  const repos = React.useMemo(
+    () => (notionProjects ?? []).map((p) => p.repo),
+    [notionProjects]
+  );
+  const { data: storiesMap, isLoading, isError } = useAllProjectStories(repos);
 
   return (
     <div id="home" className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center px-4 py-12">
@@ -20,7 +26,7 @@ export function Home() {
           style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
         >
           <CirclesThreeIcon weight="thin" className="mx-auto mb-4 opacity-40" size={40} />
-          <h1 className="font-heading text-3xl font-bold mb-2">hub</h1>
+          <h1 className="font-heading text-3xl font-bold mb-2">myHub</h1>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto">
             Portfolio dashboard — status, progresso e commits de todos os projetos.
           </p>

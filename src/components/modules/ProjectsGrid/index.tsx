@@ -1,7 +1,6 @@
 import { WarningIcon, FolderSimpleIcon } from "@phosphor-icons/react";
 import { ProjectCard } from "@/components/widgets/ProjectCard";
 import { EmptyState } from "@/components/elements/EmptyState";
-import { projects } from "@/data/config";
 import { useNotionProjects } from "@/hooks/Notion";
 import type { DerivedStory } from "@/hooks/GitHub";
 
@@ -13,12 +12,9 @@ interface ProjectsGridProps {
 }
 
 export function ProjectsGrid({ id, isLoading, isError, storiesMap }: ProjectsGridProps) {
-  const { data: notionData } = useNotionProjects();
+  const { data: notionProjects, isLoading: notionLoading } = useNotionProjects();
 
-  const enrichedProjects = projects.map((config) => {
-    const live = notionData?.find((n) => n.repo === config.repo);
-    return live ? { ...config, ...live } : config;
-  });
+  const loading = isLoading || notionLoading;
 
   if (isError) {
     return (
@@ -31,38 +27,38 @@ export function ProjectsGrid({ id, isLoading, isError, storiesMap }: ProjectsGri
     );
   }
 
-  if (!isLoading && enrichedProjects.length === 0) {
+  if (!loading && (!notionProjects || notionProjects.length === 0)) {
     return (
       <EmptyState
         id={`${id}-empty`}
         icon={<FolderSimpleIcon weight="thin" size={40} />}
         title="Nenhum projeto encontrado"
-        description="Adicione projetos ao config para visualizá-los aqui."
+        description="Adicione projetos ao banco myHub no Notion."
       />
     );
   }
 
+  const placeholderCount = notionProjects?.length ?? 3;
+
   return (
     <div id={id} className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {isLoading
-        ? Array.from({ length: projects.length }).map((_, i) => (
+      {loading
+        ? Array.from({ length: placeholderCount }).map((_, i) => (
             <div
               key={i}
               id={`project-card-placeholder-${i}`}
               className="rounded-xl border border-border bg-card px-5 py-4 h-36 animate-pulse"
             />
           ))
-        : enrichedProjects.map((config, i) => (
+        : (notionProjects ?? []).map((project, i) => (
             <div
-              key={config.repo}
-              style={{
-                animation: `slide-up 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s both`,
-              }}
+              key={project.repo}
+              style={{ animation: `slide-up 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s both` }}
             >
               <ProjectCard
-                id={`project-card-${config.repo}`}
-                config={config}
-                stories={storiesMap.get(config.repo)}
+                id={`project-card-${project.repo}`}
+                project={project}
+                stories={storiesMap.get(project.repo)}
               />
             </div>
           ))}
